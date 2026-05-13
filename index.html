@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Səni Sevirəm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #ff4d6d; --bg-color: #fff0f3; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; color: #444; }
+        
+        #question-screen { text-align: center; z-index: 10; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 3rem; color: var(--primary-color); }
+        .btn-container { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        button { padding: 15px 40px; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s; background: white; color: var(--primary-color); box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-weight: 600; }
+        button:hover { transform: scale(1.1); background: var(--primary-color); color: white; }
+        
+        #message-screen { display: none; text-align: center; max-width: 650px; padding: 20px; z-index: 10; }
+        .love-card { background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); backdrop-filter: blur(5px); }
+        
+        #gallery-screen { display: none; width: 100%; height: 100%; position: relative; }
+        
+        .center-heart-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; perspective: 800px; transition: opacity 0.5s; }
+        .main-3d-heart { font-size: 100px; color: var(--primary-color); animation: beat3D 1.2s infinite ease-in-out; display: inline-block; }
+        @keyframes beat3D { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2) rotateX(15deg); } }
+
+        .photo-wrapper { position: absolute; width: 250px; opacity: 0; transform: scale(0); transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .photo-frame { width: 100%; height: 300px; border: 8px solid white; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Yeni Səhnə Elementləri */
+        #special-scene { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        #black-out { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; opacity: 0; pointer-events: none; z-index: 200; transition: opacity 0.3s; }
+        
+        .merge-photo { position: absolute; top: 50%; width: 220px; transition: all 1.5s ease-in-out; }
+        #photo5 { left: -300px; transform: translateY(-50%); }
+        #photo6 { right: -300px; transform: translateY(-50%); }
+        
+        #photo7 { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 350px; opacity: 0; transition: all 1s ease-out; z-index: 250; }
+
+        .floating-heart { position: fixed; color: var(--primary-color); pointer-events: none; animation: fly 4s linear forwards; z-index: 5; }
+        @keyframes fly { 0% { transform: translateY(100vh) scale(0); opacity: 1; } 100% { transform: translateY(-10vh) scale(1.5); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <audio id="love-song" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="black-out"></div>
+
+    <div id="question-screen">
+        <h1>Bugün necə marttı?</h1>
+        <div class="btn-container">
+            <button onclick="wrong()">2</button>
+            <button onclick="correct()">13</button>
+        </div>
+    </div>
+
+    <div id="message-screen">
+        <div class="love-card">
+            <h2 style="font-family: 'Dancing Script'; color: var(--primary-color); font-size: 2.5rem;">7 ayımız mübarək! ❤️</h2>
+            <p id="text-area" style="min-height: 100px;"></p>
+            <button id="magic-btn" onclick="showPhotos()" style="display:none; background: var(--primary-color); color:white; margin-top: 20px;">Bura bas sevgilim...</button>
+        </div>
+    </div>
+
+    <div id="gallery-screen">
+        <div class="center-heart-box" id="mid-heart"><div class="main-3d-heart">❤</div></div>
+        <div class="photo-wrapper" id="w1" style="top: 5%; left: 5%;"><div class="photo-frame"><img src="foto1.jpg"></div></div>
+        <div class="photo-wrapper" id="w2" style="top: 55%; left: 5%;"><div class="photo-frame"><img src="foto2.jpg"></div></div>
+        <div class="photo-wrapper" id="w3" style="top: 5%; left: 75%;"><div class="photo-frame"><img src="foto3.jpg"></div></div>
+        <div class="photo-wrapper" id="w4" style="top: 55%; left: 75%;"><div class="photo-frame"><img src="foto4.jpg"></div></div>
+    </div>
+
+    <div id="special-scene">
+        <div class="photo-frame merge-photo" id="photo5"><img src="foto5.jpg"></div>
+        <div class="photo-frame merge-photo" id="photo6"><img src="foto6.jpg"></div>
+        <div class="photo-frame" id="photo7"><img src="foto7.jpg"></div>
+    </div>
+
+    <script>
+        const song = document.getElementById('love-song');
+
+        function wrong() { alert("Yəqin həyəcanlısan, bir də düşün... 😊"); }
+
+        function correct() {
+            song.play().then(() => { song.currentTime = 42; }).catch(() => { song.currentTime = 42; song.play(); });
+            document.getElementById('question-screen').style.display = 'none';
+            document.getElementById('message-screen').style.display = 'block';
+            const txt = "Onda deməli dünən bizim 7 ayımız tamam oldu! Təbrik edirəm ömrüm. Səni hər keçən gün daha çox, daha dərindən sevirəm. Sən mənim həyatıma gələn ən gözəl varlıqsan. Sən çox dəyərlisən, hərşeyimsə. Bu 7 ayı mənə yaşatdığın üçün çox sağ ol, neçə belə aylara, illərə sevgilim... ❤️";
+            let i = 0;
+            function typing() {
+                if (i < txt.length) { document.getElementById("text-area").innerHTML += txt.charAt(i); i++; setTimeout(typing, 40); }
+                else { document.getElementById('magic-btn').style.display = 'inline-block'; }
+            }
+            typing(); startHearts();
+        }
+
+        function showPhotos() {
+            document.getElementById('message-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('message-screen').style.display = 'none';
+                document.getElementById('gallery-screen').style.display = 'block';
+                ['w1', 'w2', 'w3', 'w4'].forEach((id, idx) => {
+                    setTimeout(() => {
+                        const el = document.getElementById(id);
+                        el.style.opacity = '1';
+                        el.style.transform = 'scale(1) rotate('+(Math.random()*10-5)+'deg)';
+                    }, idx * 600);
+                });
+
+                // Şəkillər bitəndən sonra final səhnəsini başlat (təxminən 3 saniyə sonra)
+                setTimeout(startFinalScene, 4000);
+            }, 500);
+        }
+
+        function startFinalScene() {
+            document.getElementById('special-scene').style.display = 'block';
+            const p5 = document.getElementById('photo5');
+            const p6 = document.getElementById('photo6');
+
+            // 1. Foto 5 və 6 kənarlardan gəlir
+            setTimeout(() => {
+                p5.style.left = '20%';
+                p6.style.right = '20%';
+            }, 100);
+
+            // 2. Bir-birinə doğru birləşirlər
+            setTimeout(() => {
+                p5.style.left = '40%';
+                p6.style.right = '40%';
+                p5.style.opacity = '0.5';
+                p6.style.opacity = '0.5';
+            }, 2000);
+
+            // 3. Ekran qaralır və Foto 7 gəlir
+            setTimeout(() => {
+                const blackout = document.getElementById('black-out');
+                blackout.style.opacity = '1';
+                
+                setTimeout(() => {
+                    document.getElementById('gallery-screen').style.display = 'none';
+                    p5.style.display = 'none';
+                    p6.style.display = 'none';
+                    
+                    const p7 = document.getElementById('photo7');
+                    p7.style.opacity = '1';
+                    p7.style.transform = 'translate(-50%, -50%) scale(1)';
+                    
+                    blackout.style.opacity = '0';
+                }, 400);
+            }, 3500);
+        }
+
+        function startHearts() {
+            setInterval(() => {
+                const h = document.createElement('div');
+                h.innerHTML = '❤'; h.className = 'floating-heart';
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 4000);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
